@@ -42,7 +42,24 @@ namespace AirportTicketBookingSystem.FlightHandler
         {
             return _flightSeats;
         }
-        
+
+        public int ReserveSpecificSeat(int seat)
+        {
+            if (_flightSeats.Contains(seat))
+            {
+                _flightSeats.Remove(seat);
+                return seat;
+            }
+            else
+                return -1;
+        }
+
+        public void UnReserveSeat(int seat)
+        {
+            if( !_flightSeats.Contains(seat) && seat >= 1 && seat <= NumberOfSeats)
+                _flightSeats.Add(seat);
+        }
+
         public void AddBooking(Booking booking)
         {
             _bookings.Add(booking);
@@ -57,7 +74,6 @@ namespace AirportTicketBookingSystem.FlightHandler
         {
             return _bookings;
         }
-
 
         public override string ToString()
         {
