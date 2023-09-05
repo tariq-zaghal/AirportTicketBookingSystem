@@ -25,69 +25,17 @@ namespace AirportTicketBookingSystem.PassengerHandler
 
             while (work)
             {
+                PassengerConsoleText.DisplayPassengerOperationsMenu();
+
                 PassengerOptions passengerOption = GetPassengerOption();
 
                 if (passengerOption == PassengerOptions.BookFlight)
                 {
-                    List<Flight> filteredFlights = FlightBoardConsoleOperations.FilterAvailableFlights(flightBoard);
-
-                    if (filteredFlights.Any())
-                    {
-                        FlightBoardConsoleOperations.DisplayAvailableFlights(filteredFlights);
-
-                        Console.WriteLine("Enter the Id of the flight you want to book: \n");
-                        int flightId = FlightBoardConsoleOperations.GetFlightIdFromUser();
-
-                        Flight? flightToBook = flightBoard.FindFlightById(flightId);
-
-                        if (flightToBook != null)
-                        {
-                            int chosenSeat = ChooseSeat(flightToBook);
-                            if (chosenSeat == -1)
-                            {
-                                Console.WriteLine("Invalid input");
-                                continue;
-                            }
-                            if (flightToBook.ReserveSpecificSeat(chosenSeat) != -1)
-                            {
-                                SeatClass? seatClass = GetPassengerSeatClassFromUser();
-
-                                Booking newBooking = new Booking(passenger, flightToBook, chosenSeat, seatClass);
-                                BookingMaker.MakeBooking(passenger, newBooking, flightToBook);
-                                Console.WriteLine(newBooking.ToString());
-                            }
-                            else
-                            {
-                                Console.WriteLine("Seat was not found");
-                                continue;
-                            }
-                        }
-                    }
-                    else
-                    {
-                        Console.WriteLine("Flight with such specifications was not found\n");
-                        break;
-                    }
+                    BookFlightOperation(passenger,  flightBoard);
                 }
                 else if (passengerOption == PassengerOptions.EditABooking)
                 {
-                    Booking? bookingToEdit = ChooseBookingToEdit(passenger);
-
-                    if (bookingToEdit != null)
-                    {
-                        int chosenNewSeat = ChooseSeat(bookingToEdit.FlightBooked);
-                        bookingToEdit.FlightBooked.UnReserveSeat(bookingToEdit.SeatNumber);
-                        bookingToEdit.SeatNumber = chosenNewSeat;
-
-                        SeatClass? seatClass = GetPassengerSeatClassFromUser();
-                        if (seatClass != null)
-                            bookingToEdit.ChangeClass(seatClass);
-                    }
-                    else
-                    {
-                        Console.WriteLine("Invalid input!");
-                        continue;
-                    }
+                    EditABookingOperation(passenger);
                 }
                 else
                 {
@@ -119,7 +67,7 @@ namespace AirportTicketBookingSystem.PassengerHandler
 
         private static PassengerOptions GetPassengerOption()
         {
-             bool isValid = true;
+            bool isValid = true;
 
             var choice = Console.ReadLine();
             int optionsEnumSize = Enum.GetValues(typeof(PassengerOptions)).Length;
@@ -134,21 +82,6 @@ namespace AirportTicketBookingSystem.PassengerHandler
             }
 
             return (PassengerOptions)Enum.Parse(typeof(PassengerOptions), choice, true);
-        }
-
-        private static int ChooseSeat(Flight flightToBook)
-        {
-            List<int> availableSeats = flightToBook.getSeats();
-
-            PassengerConsoleText.PromptPassengerToChooseSeat();
-
-            flightToBook.getSeats().ForEach(seat => Console.WriteLine(seat));
-            int chosenSeat = -1;
-            var chosenSeatInput = Console.ReadLine();
-            if(ValidateInput.IsIntValid(chosenSeatInput))            
-                chosenSeat = int.Parse(chosenSeatInput);
-
-            return chosenSeat;
         }
 
         private static SeatClass? GetPassengerSeatClassFromUser()
@@ -209,6 +142,43 @@ namespace AirportTicketBookingSystem.PassengerHandler
                 Console.WriteLine("Flight with such specifications was not found\n");
                 return;
             }
+        }
+
+        private static void EditABookingOperation(Passenger passenger)
+        {
+            Booking? bookingToEdit = ChooseBookingToEdit(passenger);
+
+            if (bookingToEdit != null)
+            {
+                int chosenNewSeat = ChooseSeat(bookingToEdit.FlightBooked);
+                bookingToEdit.FlightBooked.UnReserveSeat(bookingToEdit.SeatNumber);
+                bookingToEdit.SeatNumber = chosenNewSeat;
+
+                SeatClass? seatClass = GetPassengerSeatClassFromUser();
+                if (seatClass != null)
+                    bookingToEdit.ChangeClass(seatClass);
+            }
+            else
+            {
+                Console.WriteLine("Invalid input!");
+                return;
+            }
+
+        }
+
+        private static int ChooseSeat(Flight flightToBook)
+        {
+            List<int> availableSeats = flightToBook.getSeats();
+
+            PassengerConsoleText.PromptPassengerToChooseSeat();
+
+            flightToBook.getSeats().ForEach(seat => Console.WriteLine(seat));
+            int chosenSeat = -1;
+            var chosenSeatInput = Console.ReadLine();
+            if (ValidateInput.IsIntValid(chosenSeatInput))
+                chosenSeat = int.Parse(chosenSeatInput);
+
+            return chosenSeat;
         }
 
         private static SeatClass? GetPassengerSeatClass(string classToBeParsed) 
