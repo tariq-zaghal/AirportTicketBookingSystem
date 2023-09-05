@@ -1,4 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using System;
+using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using AirportTicketBookingSystem.BookingHandler;
 using AirportTicketBookingSystem.Validation;
@@ -64,9 +65,19 @@ namespace AirportTicketBookingSystem.FlightHandler
             return _flightSeats;
         }
 
+        private bool IsSeatEmpty(int seat)
+        {
+            return _flightSeats.Contains(seat);
+        }
+
+        public bool IsPlaneFull()
+        {
+            return _flightSeats.Count == 0;
+        }
+
         public int ReserveSpecificSeat(int seat)
         {
-            if (_flightSeats.Contains(seat))
+            if (IsSeatEmpty(seat))
             {
                 _flightSeats.Remove(seat);
                 return seat;
@@ -94,6 +105,26 @@ namespace AirportTicketBookingSystem.FlightHandler
         public List<Booking> GetBookings()
         {
             return _bookings;
+        }
+
+        public bool IsFlightValid()
+        {
+            var validationContext = new ValidationContext(this);
+            var validationResults = new System.Collections.Generic.List<ValidationResult>();
+
+            bool isValid = Validator.TryValidateObject(this, validationContext, validationResults, validateAllProperties: true);
+
+            return isValid;
+        }
+        
+        public List<ValidationResult> GetFlightErrors()
+        {
+            var validationContext = new ValidationContext(this);
+            var validationResults = new System.Collections.Generic.List<ValidationResult>();
+
+            bool isValid = Validator.TryValidateObject(this, validationContext, validationResults, validateAllProperties: true);
+
+            return validationResults;
         }
 
         public string FormattedString()
