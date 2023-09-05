@@ -96,6 +96,13 @@ namespace AirportTicketBookingSystem.FlightHandler
             return _bookings;
         }
 
+        public string FormattedString()
+        {
+            return $"{FlightId,-5} {DepartureCountry,-25} {DepartureAirport,-20}" +
+                   $"{DepartureDateTime,-25} {DestinationCountry,-25} " +
+                   $"{DestinationAirport,-20} {FlightBasePrice,-8}";
+        }
+
         public override string ToString()
         {
             return $"Departure country = {DepartureCountry}\n" +
