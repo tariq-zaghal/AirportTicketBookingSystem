@@ -31,7 +31,7 @@ namespace AirportTicketBookingSystem
                 }
                 else if (ManagerOrPassenger == ChooseManagerOrPassenger.ExitApp)
                 {
-                    Console.WriteLine("Bye :)");
+                    Console.WriteLine("Bye User :)");
                     break;
                 }
             }
